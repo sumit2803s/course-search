@@ -7,6 +7,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
+import org.springframework.data.elasticsearch.core.suggest.Completion;
 import org.springframework.stereotype.Component;
 
 import com.example.course_search.model.CourseDocument;
@@ -32,7 +33,7 @@ public class DataLoader implements CommandLineRunner {
         InputStream is = getClass().getResourceAsStream("/sample-courses.json");
         ObjectMapper mapper = new ObjectMapper();
         List<CourseDocument> courses = Arrays.asList(mapper.readValue(is, CourseDocument[].class));
-
+        courses.forEach(course -> course.setSuggest(new Completion(List.of(course.getTitle()))));
         courseRepository.saveAll(courses);
         System.out.println("✔ Loaded " + courses.size() + " courses into Elasticsearch.");
     }

@@ -1,6 +1,8 @@
 package com.example.course_search.controller;
 
+import java.io.IOException;
 import java.time.Instant;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.format.annotation.DateTimeFormat;
@@ -9,17 +11,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.course_search.service.AutoCompleteService;
 import com.example.course_search.service.CourseSearchService;
-
-import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api")
 public class CourseSearchController {
 
     private final CourseSearchService searchService;
-    public CourseSearchController(CourseSearchService searchService) {
+    private final AutoCompleteService autocompleteService;
+
+    public CourseSearchController(CourseSearchService searchService, AutoCompleteService autocompleteService) {
         this.searchService = searchService;
+        this.autocompleteService = autocompleteService;
     }
 
     @GetMapping("/search")
@@ -40,5 +44,14 @@ public class CourseSearchController {
                 q, minAge, maxAge, category, type,
                 minPrice, maxPrice, startDate, sort, page, size
         );
+    }
+    public CourseSearchController(AutoCompleteService autocompleteService, CourseSearchService searchService) {
+        this.searchService = searchService;
+        this.autocompleteService = autocompleteService;
+    }
+
+    @GetMapping("/suggest")
+    public List<String> suggest(@RequestParam String q) throws IOException {
+        return autocompleteService.suggest(q);
     }
 }
